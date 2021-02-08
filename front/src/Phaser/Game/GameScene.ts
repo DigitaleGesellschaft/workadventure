@@ -60,6 +60,7 @@ import {Room} from "../../Connexion/Room";
 import {jitsiFactory} from "../../WebRtc/JitsiFactory";
 import {urlManager} from "../../Url/UrlManager";
 import {audioManager} from "../../WebRtc/AudioManager";
+import {videoManager} from "../../WebRtc/VideoManager";
 import {PresentationModeIcon} from "../Components/PresentationModeIcon";
 import {ChatModeIcon} from "../Components/ChatModeIcon";
 import {OpenChatIcon, openChatIconName} from "../Components/OpenChatIcon";
@@ -67,6 +68,8 @@ import {SelectCharacterScene, SelectCharacterSceneName} from "../Login/SelectCha
 import {TextureError} from "../../Exception/TextureError";
 import {addLoader} from "../Components/Loader";
 import {ErrorSceneName} from "../Reconnecting/ErrorScene";
+
+import AnimatedTiles from "phaser-animated-tiles";
 
 export interface GameSceneInitInterface {
     initPosition: PointInterface|null,
@@ -114,6 +117,7 @@ export class GameScene extends ResizableScene implements CenterListener {
     Layers!: Array<Phaser.Tilemaps.TilemapLayer>;
     Objects!: Array<Phaser.Physics.Arcade.Sprite>;
     mapFile!: ITiledMap;
+    animatedTiles!: AnimatedTiles;
     groups: Map<number, Sprite>;
     startX!: number;
     startY!: number;
@@ -191,6 +195,7 @@ export class GameScene extends ResizableScene implements CenterListener {
                 message: file.src
             });
         });
+        this.load.scenePlugin('AnimatedTiles', AnimatedTiles, 'animatedTiles', 'animatedTiles');
         this.load.on('filecomplete-tilemapJSON-'+this.MapUrlFile, (key: string, type: string, data: unknown) => {
             this.onMapLoad(data);
         });
@@ -380,6 +385,7 @@ export class GameScene extends ResizableScene implements CenterListener {
 
         this.initCamera();
 
+        this.animatedTiles.init(this.Map);
         this.initCirclesCanvas();
 
         // Let's pause the scene if the connection is not established yet
@@ -469,12 +475,14 @@ export class GameScene extends ResizableScene implements CenterListener {
 
             this.connection.onGroupUpdatedOrCreated((groupPositionMessage: GroupCreatedUpdatedMessageInterface) => {
                 audioManager.decreaseVolume();
+                videoManager.decreaseVolume();
                 this.shareGroupPosition(groupPositionMessage);
                 this.openChatIcon.setVisible(true);
             })
 
             this.connection.onGroupDeleted((groupId: number) => {
                 audioManager.restoreVolume();
+                videoManager.restoreVolume();
                 try {
                     this.deleteGroup(groupId);
                     this.openChatIcon.setVisible(false);
@@ -610,6 +618,19 @@ export class GameScene extends ResizableScene implements CenterListener {
         }
     }
 
+    private playVideo(url: string|number|boolean|undefined, loop=false): void {
+        if (url === undefined) {
+            videoManager.unloadVideo();
+        } else {
+            const realVideoPath = '' + url;
+            videoManager.loadVideo(realVideoPath);
+
+            if (loop) {
+                videoManager.loop();
+            }
+        }
+    }
+
     private triggerOnMapLayerPropertyChange(){
         this.gameMap.onPropertyChange('exitSceneUrl', (newValue, oldValue) => {
             if (newValue) this.onMapExit(newValue as string);
@@ -623,7 +644,7 @@ export class GameScene extends ResizableScene implements CenterListener {
                 coWebsiteManager.closeCoWebsite();
             }else{
                 const openWebsiteFunction = () => {
-                    coWebsiteManager.loadCoWebsite(newValue as string);
+                    coWebsiteManager.loadCoWebsite(newValue as string, this.MapUrlFile);
                     layoutManager.removeActionButton('openWebsite', this.userInputManager);
                 };
 
@@ -676,6 +697,13 @@ export class GameScene extends ResizableScene implements CenterListener {
 
         this.gameMap.onPropertyChange('playAudioLoop', (newValue, oldValue) => {
             this.playAudio(newValue, true);
+        });
+        this.gameMap.onPropertyChange('playVideo', (newValue, oldValue) => {
+            this.playVideo(newValue);
+        });
+
+        this.gameMap.onPropertyChange('playVideoLoop', (newValue, oldValue) => {
+            this.playVideo(newValue, true);
         });
 
     }
