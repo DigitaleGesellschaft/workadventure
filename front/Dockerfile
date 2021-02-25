@@ -23,6 +23,7 @@ ARG INSERT_ANALYTICS=NO
 ARG GA_TRACKING_ID=""
 ARG START_ROOM_URL=/_/global/digitalegesellschaft.github.io/workadventure-map-winterkongress/winterlandschaft.json
 ARG STUN_SERVER="stun:coturn.binarylogic.ch"
+ARG TURN_SERVER="turn:coturn.binarylogic.ch"
 ARG JITSI_URL=open.meet.switch.ch
 
 RUN API_URL=$API_URL INSERT_ANALYTICS=$INSERT_ANALYTICS GA_TRACKING_ID=$GA_TRACKING_ID START_ROOM_URL=$START_ROOM_URL STUN_SERVER=$STUN_SERVER JITSI_URL=$JITSI_URL\
