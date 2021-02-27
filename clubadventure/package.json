@@ -4,7 +4,8 @@
   "description": "WorkAdventure choreographies",
   "scripts": {
     "dump-players": "ts-node -r dotenv/config ./dump-players.ts",
-    "bolo": "ts-node -r dotenv/config ./bolo.ts"
+    "bolo": "ts-node -r dotenv/config ./bolo.ts",
+    "partner": "ts-node -r dotenv/config ./partner.ts"
   },
   "dependencies": {
     "@types/ws": "^7.2.6",
