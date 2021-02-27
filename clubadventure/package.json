@@ -6,7 +6,8 @@
     "dump-players": "ts-node -r dotenv/config ./dump-players.ts",
     "bolo": "ts-node -r dotenv/config ./bolo.ts",
     "square": "ts-node -r dotenv/config ./square.ts",
-    "partner": "ts-node -r dotenv/config ./partner.ts"
+    "partner": "ts-node -r dotenv/config ./partner.ts",
+    "circle": "ts-node -r dotenv/config ./circle.ts"
   },
   "dependencies": {
     "@types/ws": "^7.2.6",
