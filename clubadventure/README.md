@@ -8,3 +8,5 @@ Usage:
 
 Choreographies:
 * `yarn run bolo`: A queue of avatars following the anchor player.
+* `yarn run partner`: Dance with a partner.
+* `yarn run square`: Square dance.
